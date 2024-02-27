@@ -1,0 +1,15 @@
+{% macro datos(name, placeholder, type='text') %}
+<p><input name="{{ name }}" placeholder="{{ placeholder }}" type="{{ type }}"></p>
+{% endmacro %}
+
+
+
+{% macro render_field(field) %}
+    <td>{{ field.label }}</td>
+    <td>{{ field(**kwargs)|safe }}</td>
+    {% if field.errors %}
+            {% for error in field.errors %}
+                <li style="color: red;">{{ error }}</li>
+            {% endfor %}
+    {% endif %}
+{% endmacro %}

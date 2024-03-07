@@ -2,6 +2,7 @@ from calendar import monthrange
 from datetime import datetime,timedelta
 from flask import Flask,request,render_template,Response,redirect,url_for
 from flask import flash
+from sqlalchemy import extract
 from config import DevelopmentConfig
 from flask_wtf.csrf import CSRFProtect
 import forms
@@ -53,7 +54,7 @@ def pizzas():
     ventas = None 
     suma_total = None 
     
-    if request.method == "POST" and "fecha_consulta" not in request.form:
+    if request.method == "POST" and not ("fecha_consulta" in request.form or "mes_consulta" in request.form):
         ingredientes_seleccionados = []
         if pizza_form.jamon.data:
             ingredientes_seleccionados.append("Jamon")
@@ -87,12 +88,20 @@ def pizzas():
         
         id_pizza += 1
 
-    if request.method == "POST" or request.method == "GET":
+    if request.method == "POST" or request.method == "GET" and "mes_consulta" not in request.form:
         fecha_consulta_str = request.form.get("fecha_consulta")
         if fecha_consulta_str:
             fecha_consulta = datetime.strptime(fecha_consulta_str, "%Y-%m-%d").date()
             
             ventas = Pizzas.query.filter(Pizzas.create_date >= fecha_consulta).filter(Pizzas.create_date < fecha_consulta + timedelta(days=1)).all()
+            suma_total = sum(venta.total for venta in ventas)
+            
+    if request.method == "POST" or request.method == "GET" and "mes_consulta" in request.form:
+        mes_consulta_str = request.form.get("mes_consulta")
+        if mes_consulta_str:
+            fecha_consulta = datetime.now().replace(month=int(mes_consulta_str))
+            
+            ventas = Pizzas.query.filter(extract('month', Pizzas.create_date) == int(mes_consulta_str)).all()
             suma_total = sum(venta.total for venta in ventas)
 
     

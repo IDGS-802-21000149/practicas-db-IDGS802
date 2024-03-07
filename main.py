@@ -9,10 +9,12 @@ from models import Alumnos
 from models import Profesores,Pizzas
 from models import db
 
-
 app=Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 csrf=CSRFProtect()
+
+temporal = []
+id_pizza = 1
 
 @app.route("/index",methods=["GET","POST"])
 def index():
@@ -25,6 +27,8 @@ def index():
       db.session.add(alum)
       db.session.commit()
    return render_template("index.html",form=alum_form)
+
+
 
 @app.route("/profesores",methods=["GET","POST"])
 def profesores():
@@ -41,10 +45,6 @@ def profesores():
    return render_template("profesores.html",form=profe)
 
 
-
-temporal = []
-id_pizza = 1
-
 @app.route("/pizza", methods=["GET", "POST"])
 def pizzas():
     global temporal, id_pizza, temporalbd
@@ -55,7 +55,6 @@ def pizzas():
     
     if request.method == "POST" and "fecha_consulta" not in request.form:
         ingredientes_seleccionados = []
-
         if pizza_form.jamon.data:
             ingredientes_seleccionados.append("Jamon")
         if pizza_form.pinia.data:
@@ -85,15 +84,14 @@ def pizzas():
             'numero': pizza_form.numero.data,
             'totalP': totalP
         })
+        
         id_pizza += 1
-    
-    # Consultar ventas solo si se ha enviado el formulario de fecha de consulta
+
     if request.method == "POST" or request.method == "GET":
         fecha_consulta_str = request.form.get("fecha_consulta")
         if fecha_consulta_str:
             fecha_consulta = datetime.strptime(fecha_consulta_str, "%Y-%m-%d").date()
             
-            # Consultar las ventas realizadas en la fecha seleccionada
             ventas = Pizzas.query.filter(Pizzas.create_date >= fecha_consulta).filter(Pizzas.create_date < fecha_consulta + timedelta(days=1)).all()
             suma_total = sum(venta.total for venta in ventas)
 

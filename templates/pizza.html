@@ -1,0 +1,155 @@
+{% extends 'layout2.html' %}
+{% from '_macros.html' import render_field %}
+{% block content %}
+<style>
+    .labels {
+        display: inline-block;
+        margin-right: 10px;
+    }
+</style>
+<div class="container">
+    <form name="registro" action="/pizza" id="registro" method="POST">
+   <div class="row">
+       <div class="col-md-4">
+           <div class="form-group">
+               {{ render_field(form.nombre, class="form-control") }}
+           </div>
+       </div>
+       <div class="col-md-4">
+           <div class="form-group">
+               {{ render_field(form.direccion, class="form-control") }}
+           </div>
+       </div>
+       <div class="col-md-4">
+           <div class="form-group">
+            <label class="labels">{{ render_field(form.telefono, class="form-control") }} </label>
+
+           </div>
+       </div>
+   </div>
+   <div class="row">
+       <div class="col-md-4">
+           <div class="form-group">
+               {{ render_field(form.tamanio) }}
+           </div>
+       </div>
+       <div class="col-md-4">
+        <div class="form-group">
+            <label>Ingredientes:</label>
+            
+            <label class="labels">{{ render_field(form.jamon) }} </label>
+            <label class="labels">{{ render_field(form.pinia) }}</label>
+            <label class="labels">{{ render_field(form.champiniones) }} </label>
+        </div>
+       </div>
+       <div class="col-md-4">
+           <div class="form-group">
+               {{ render_field(form.numero, class="form-control") }}
+           </div>
+       </div>
+   </div>
+       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+       <input type="submit" id="registrar" name="registrar" value="Registrar" class="btn btn-primary">
+   </form>
+   <div class="row">
+    <div class="col-md-6">
+        <table class="table table-striped table-bordered ">
+            <thead>
+                <tr>
+                    <th>id</th>
+                    <th>Tamanio</th>
+                    <th>Ingredientes</th>
+                    <th>Num. Pizzas</th>
+                    <th>Subtotal</th>
+                    <th>Eliminar</th>
+                </tr>
+            </thead>
+        <tbody>
+            {%for t in temporal%}
+            <tr>
+                <td>{{t.id}}</td>
+                <td>{{t.tamanio}}</td>
+                <td>
+                    {%for i in t.ingredientes%}
+                    {{i}}
+                    {%endfor%}
+                </td>
+                <td>{{t.numero}}</td>
+                <td>{{t.totalP}}</td>
+                <td>
+                    <form action="/eliminarPizza" method="post">
+                        <input type="hidden" name="id" value="{{ t.id }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="submit" value="Eliminar" class="btn btn-danger">
+                    </form>
+                </td>
+            </tr>
+            {%endfor%}
+        </tbody>
+        </table>
+
+        <div class="d-flex justify-content-center align-items-center">
+            <form action="/confirmar" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button class="btn btn-info">Confirmar</button>
+            </form>
+
+    
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div>
+            <table class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if ventas %}
+                    {% for venta in ventas %}
+                    <tr>
+                        <td>{{ venta.nombre }}</td>
+                        <td>{{ venta.total }}</td>
+                    </tr>
+                    {% endfor %}
+                    {%endif%}
+                </tbody>
+            </table>
+
+        </div>
+        <div class="d-flex justify-content-center align-items-center">
+            {% if suma_total %}
+            <h1>Se vendio un total de ${{suma_total }}</h1>
+            {%endif%}
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center">
+            <form action="/pizza" method="post">
+                <input type="date" name="fecha_consulta" class="form-control">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary">Consultar Ventas por Dia</button>
+            </form>       
+        </div>
+
+        <div class="d-flex justify-content-center align-items-center">
+            <form action="/pizza" method="post">
+                
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-primary">Consultar Ventas por Mes</button>
+            </form>       
+        </div>
+
+
+    </div>
+
+   
+
+ </div>
+   
+
+</div>
+
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 from wtforms import Form
-from wtforms import StringField,IntegerField,RadioField
+from wtforms import StringField,IntegerField,RadioField,BooleanField 
 from wtforms import EmailField
 from wtforms import validators
 
@@ -36,10 +36,31 @@ class Profe(Form):
     email=EmailField("email",[validators.Email(message="Ingrese un correo valido")])
 
 
-class GuardarIdiomaForm(Form):
-    espaniol = StringField("Español", validators=[validators.DataRequired(message="El campo es requerido")])
-    ingles = StringField("Inglés", validators=[validators.DataRequired(message="El campo es requerido")])
 
-class ConsultarIdiomaForm(Form):
-    palabra = StringField("Palabra a buscar", validators=[validators.DataRequired(message="El campo es requerido")])
-    idioma = RadioField("Idioma", choices=[("Espanol", "Español"), ("Ingles", "Inglés")])
+class PizzaForm(Form):
+    
+      id=IntegerField('id')
+      nombre=StringField("Nombre",[
+        validators.DataRequired(message="El campo es requerido"),
+        validators.Length(min=4,max=10,message="ingresa nombre vailido")
+    ])
+      direccion=StringField("Direccion",[
+        validators.DataRequired(message="El campo es requerido"),
+        validators.Length(min=4,max=10,message="ingresa nombre vailido")
+    ])
+      telefono=StringField("Telefono",[
+        validators.DataRequired(message="El campo es requerido"),
+    ])
+      tamanio = RadioField("Tamanio", choices=[("Chica", "Chica $40"), 
+                                              ("Mediana", "Mediana $80"),
+                                              ("Grande","Grande $120")])
+      jamon = BooleanField('Jamón $10')
+      pinia = BooleanField('Piña $10')
+      champiniones = BooleanField('Champiñones $10')
+      
+      numero=IntegerField("Numero",[
+        validators.DataRequired(message="El campo es requerido"),
+    ])
+      
+    
+      

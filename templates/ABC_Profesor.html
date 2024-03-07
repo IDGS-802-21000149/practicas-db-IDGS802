@@ -27,8 +27,8 @@
                <td>{{prof.amaterno}}</td>
                <td>{{prof.email}}</td>
                <td>{{prof.grupo}}</td>
-               <td><a href="eliminar.html?id={{prof.id}}" class="btn btn-outline-danger">Eliminar </a></td>
-               <td><a href="modificar.html?id={{prof.id}}" class="btn btn-outline-warning">Modificar </a></td>
+               <td><a href="/eliminar?id={{prof.id}}" class="btn btn-outline-danger">Eliminar </a></td>
+               <td><a href="/modificar?id={{prof.id}}" class="btn btn-outline-warning">Modificar </a></td>
            </tr>
            {%endfor%}
        </tbody>

@@ -24,7 +24,6 @@ def index():
       alum=Alumnos(nombre=alum_form.nombre.data,
                   apaterno=alum_form.apaterno.data,
                   email=alum_form.email.data)
-      #INSERT INTO alumnos VALUES()
       db.session.add(alum)
       db.session.commit()
    return render_template("index.html",form=alum_form)
@@ -48,13 +47,14 @@ def profesores():
 
 @app.route("/pizza", methods=["GET", "POST"])
 def pizzas():
-    global temporal, id_pizza, temporalbd
+    global temporal, id_pizza
     pizza_form = forms.PizzaForm(request.form)
     
     ventas = None 
     suma_total = None 
+    mensaje=None
     
-    if request.method == "POST" and not ("fecha_consulta" in request.form or "mes_consulta" in request.form):
+    if request.method == "POST" and not ("fecha_consulta" in request.form or "mes_consulta" in request.form or "dia_consulta" in request.form):
         ingredientes_seleccionados = []
         if pizza_form.jamon.data:
             ingredientes_seleccionados.append("Jamon")
@@ -74,6 +74,10 @@ def pizzas():
         num_ingredientes = len(ingredientes_seleccionados) * 10
         total = int(num_ingredientes) + tamanio_int
         totalP = total * pizza_form.numero.data
+        fecha_seleccionada=pizza_form.fecha.data
+        dia_semana = fecha_seleccionada.strftime('%A')
+        print(dia_semana)
+
         
         temporal.append({ 
             'id': id_pizza,
@@ -83,7 +87,9 @@ def pizzas():
             'tamanio': tamanio_seleccionado,
             'ingredientes': ingredientes_seleccionados,
             'numero': pizza_form.numero.data,
-            'totalP': totalP
+            'totalP': totalP,
+            'fecha': pizza_form.fecha.data,
+            'dia':dia_semana
         })
         
         id_pizza += 1
@@ -93,7 +99,7 @@ def pizzas():
         if fecha_consulta_str:
             fecha_consulta = datetime.strptime(fecha_consulta_str, "%Y-%m-%d").date()
             
-            ventas = Pizzas.query.filter(Pizzas.create_date >= fecha_consulta).filter(Pizzas.create_date < fecha_consulta + timedelta(days=1)).all()
+            ventas = Pizzas.query.filter(Pizzas.fecha >= fecha_consulta).filter(Pizzas.fecha < fecha_consulta + timedelta(days=1)).all()
             suma_total = sum(venta.total for venta in ventas)
             
     if request.method == "POST" or request.method == "GET" and "mes_consulta" in request.form:
@@ -101,17 +107,23 @@ def pizzas():
         if mes_consulta_str:
             fecha_consulta = datetime.now().replace(month=int(mes_consulta_str))
             
-            ventas = Pizzas.query.filter(extract('month', Pizzas.create_date) == int(mes_consulta_str)).all()
+            ventas = Pizzas.query.filter(extract('month', Pizzas.fecha) == int(mes_consulta_str)).all()
             suma_total = sum(venta.total for venta in ventas)
-
+            
+    if request.method == "POST" or request.method == "GET" and "dia_consulta" in request.form:
+        dia_consulta = request.form.get("dia_consulta")
+        if dia_consulta:
+         ventas = Pizzas.query.filter(Pizzas.dia == dia_consulta).all()
+         suma_total = sum(venta.total for venta in ventas)   
     
-    return render_template("pizza.html", form=pizza_form, temporal=temporal, ventas=ventas,suma_total=suma_total)
+    return render_template("pizza.html", form=pizza_form, temporal=temporal, ventas=ventas,suma_total=suma_total,mensaje=mensaje)
 
 
 
 @app.route("/confirmar", methods=["POST"])
 def confirmar_registro():
     global temporal
+
 
     for registro in temporal:
         pizza = Pizzas(
@@ -121,12 +133,20 @@ def confirmar_registro():
             tamanio=registro['tamanio'],
             ingredientes=', '.join(registro['ingredientes']),  
             numero=registro['numero'],
-            total=registro['totalP']
+            total=registro['totalP'],
+            fecha=registro['fecha'],
+            dia=registro['dia']
+            
         )
-        db.session.add(pizza)
+    pizza.total = sum(registro['totalP'] for registro in temporal)
+    print(pizza)
+    
+    db.session.add(pizza)
 
     db.session.commit()
     temporal = [] 
+    mensaje="Venta confirmada"
+    flash(mensaje)
 
     return redirect("/pizza")  
 
@@ -137,6 +157,8 @@ def eliminar_registro():
     id_pizza = int(request.form["id"])
     temporal = [registro for registro in temporal if registro["id"] != id_pizza]
     return redirect("/pizza")
+
+
 
  
 @app.route("/ABC_Completo",methods=["GET","POST"])

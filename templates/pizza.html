@@ -48,6 +48,12 @@
                     {{ render_field(form.numero, class="form-control") }}
                 </div>
             </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="labels">{{ render_field(form.fecha) }}</label>
+
+                </div>
+            </div>
         </div>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="submit" id="registrar" name="registrar" value="Registrar" class="btn btn-primary">
@@ -92,6 +98,11 @@
                 <form action="/confirmar" method="post">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <button class="btn btn-info">Confirmar</button>
+                    {% if mensaje %}
+                    <h1>
+                        {{mensaje}}
+                    </h1>
+                    {% endif %}
                 </form>
             </div>
         </div>
@@ -101,6 +112,7 @@
                     <tr>
                         <th>Nombre</th>
                         <th>Total</th>
+                        <th>Fecha de Venta</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -109,15 +121,16 @@
                     <tr>
                         <td>{{ venta.nombre }}</td>
                         <td>{{ venta.total }}</td>
+                        <td>{{ venta.fecha}}</td>
                     </tr>
                     {% endfor %}
-                    {% endif %}
+                    {%endif%}
                 </tbody>
             </table>
             <div class="centered-button">
                 {% if suma_total %}
                 <h1>Se vendió un total de ${{ suma_total }}</h1>
-                {% endif %}
+                {%endif%}
             </div>
             <div class="centered-button">
                 <form action="/pizza" method="post">
@@ -146,6 +159,24 @@
                     <button type="submit" class="btn btn-primary">Consultar Ventas por Mes</button>
                 </form>
             </div>
+            <div class="centered-button">
+                <form action="/pizza" method="post">
+                    <select name="dia_consulta">
+                        <option value="Monday">Lunes</option>
+                        <option value="Tuesday">Martes</option>
+                        <option value="Wednesday">Miercoles</option>
+                        <option value="Thursday">Jueves</option>
+                        <option value="Friday">Viernes</option>
+                        <option value="Saturday">Sabado</option>
+                        <option value="Sunday">Domingo</option>
+      
+                    </select>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn btn-primary">Consultar Ventas por Dia</button>
+                </form>
+            </div>
+            </div>
+         
         </div>
     </div>
 </div>

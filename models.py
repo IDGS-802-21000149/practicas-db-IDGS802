@@ -28,5 +28,7 @@ class Pizzas(db.Model):
     ingredientes =db.Column(db.String(50))
     numero =db.Column(db.Integer)
     total =db.Column(db.Integer)
-    create_date=db.Column(db.DateTime,default=datetime.datetime.now)
+    fecha=db.Column(db.DateTime)
+    dia=db.Column(db.String(50))
+
     

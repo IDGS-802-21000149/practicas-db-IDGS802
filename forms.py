@@ -1,5 +1,5 @@
 from wtforms import Form
-from wtforms import StringField,IntegerField,RadioField,BooleanField 
+from wtforms import StringField,IntegerField,RadioField,BooleanField,DateField
 from wtforms import EmailField
 from wtforms import validators
 
@@ -61,6 +61,8 @@ class PizzaForm(Form):
       numero=IntegerField("Numero",[
         validators.DataRequired(message="El campo es requerido"),
     ])
+      fecha = DateField("Fecha")
+      
       
     
       
